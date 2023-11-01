@@ -1,38 +1,29 @@
 ﻿namespace Turnstile;
 
-public class TurnstileStateMachine
+public partial class TurnstileStateMachine
 {
+    private StateBase state;    
+
     public TurnstileStateMachine(TurnstileState initialState = TurnstileState.Locked)
     {
-        State = initialState;
+        state = initialState switch 
+        {           
+            TurnstileState.Locked => new Locked(this, ""),
+            TurnstileState.Unlocked => new Unlocked(this, ""),
+            _ => new Locked(this, "")
+        };
     }
 
-    public TurnstileState State {get; private set;}
+    public TurnstileState State => state.State;
 
     public string Coin() {
-        switch(State){
-            case TurnstileState.Locked:
-                State = TurnstileState.Unlocked;
-                return "Unlock";
-            case TurnstileState.Unlocked:
-                return "Thanks";
-            
-            default:
-                throw new InvalidOperationException();
-        }
+        state = state.Coin();
+        return state.Message;
     }
 
     public string Pass() 
     {
-        switch(State){
-            case TurnstileState.Locked:
-                return "Alarm";
-            case TurnstileState.Unlocked:
-                State = TurnstileState.Locked;
-                return "Lock";
-            
-            default:
-                throw new InvalidOperationException();
-        }
+        state = state.Pass();
+        return state.Message;
     }
 }
