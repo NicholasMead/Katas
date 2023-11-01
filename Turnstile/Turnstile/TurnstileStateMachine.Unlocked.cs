@@ -14,6 +14,16 @@ public partial class TurnstileStateMachine
             return new Unlocked(machine, "Thanks");
         }
 
+        public override StateBase Disable()
+        {
+            return new NoEntry(machine, "Lights Off");
+        }
+
+        public override StateBase Enable()
+        {
+            return new Unlocked(machine, "");
+        }
+
         public override StateBase Pass()
         {
             return new Locked(machine, "Lock");

@@ -16,6 +16,11 @@ public partial class TurnstileStateMachine
         public abstract TurnstileState State { get; }
 
         public abstract StateBase Coin();        
+        
         public abstract StateBase Pass();
+
+        public abstract StateBase Enable ();
+        
+        public abstract StateBase Disable ();
     }
 }

@@ -10,47 +10,60 @@ public class TurnstileStateMachineTests
         Assert.Equal(TurnstileState.Locked, machine.State);
     }
 
-    [Fact]
-    public void OnCoin_FromLocked_Unlock()
+    [Theory]
+    [InlineData(TurnstileState.Locked, TurnstileState.Unlocked, "Unlock")]
+    [InlineData(TurnstileState.Unlocked, TurnstileState.Unlocked, "Thanks")]
+    [InlineData(TurnstileState.NoEntry, TurnstileState.NoEntry, "")]
+    public void Coin(TurnstileState initialState, TurnstileState endState, string message)
     {
-        var machine = new TurnstileStateMachine();
+        var machine = new TurnstileStateMachine(initialState);
 
         var result = machine.Coin();
 
-        Assert.Equal("Unlock", result);
-        Assert.Equal(TurnstileState.Unlocked, machine.State);
+        Assert.Equal(message, result);
+        Assert.Equal(endState, machine.State);
     }
 
-    [Fact]
-    public void OnCoin_FromUnlock_Thanks()
+    [Theory]
+    [InlineData(TurnstileState.Locked, TurnstileState.Locked, "Alarm")]
+    [InlineData(TurnstileState.Unlocked, TurnstileState.Locked, "Lock")]
+    [InlineData(TurnstileState.NoEntry, TurnstileState.NoEntry, "Alarm")]
+    public void Pass(TurnstileState initialState, TurnstileState endState, string message)
     {
-        var machine = new TurnstileStateMachine(TurnstileState.Unlocked);
-
-        var result = machine.Coin();
-
-        Assert.Equal("Thanks", result);
-        Assert.Equal(TurnstileState.Unlocked, machine.State);
-    }
-
-    [Fact]
-    public void OnPass_FromUnlocked_Locks()
-    {
-        var machine = new TurnstileStateMachine(TurnstileState.Unlocked);
+        var machine = new TurnstileStateMachine(initialState);
 
         var result = machine.Pass();
-        
-        Assert.Equal("Lock", result);
-        Assert.Equal(TurnstileState.Locked, machine.State);
+
+        Assert.Equal(message, result);
+        Assert.Equal(endState, machine.State);
     }
 
-        [Fact]
-    public void OnPass_FromUnlock_Alarm()
-    {
-        var machine = new TurnstileStateMachine(TurnstileState.Locked);
 
-        var result = machine.Pass();
-        
-        Assert.Equal("Alarm", result);
-        Assert.Equal(TurnstileState.Locked, machine.State);
+    [Theory]
+    [InlineData(TurnstileState.Locked, TurnstileState.NoEntry, "Lights Off")]
+    [InlineData(TurnstileState.Unlocked, TurnstileState.NoEntry, "Lights Off")]
+    [InlineData(TurnstileState.NoEntry, TurnstileState.NoEntry, "")]
+    public void Disable(TurnstileState initialState, TurnstileState endState, string message)
+    {
+        var machine = new TurnstileStateMachine(initialState);
+
+        var result = machine.Disable();
+
+        Assert.Equal(message, result);
+        Assert.Equal(endState, machine.State);
+    }
+
+    [Theory]
+    [InlineData(TurnstileState.Locked, TurnstileState.Locked, "")]
+    [InlineData(TurnstileState.Unlocked, TurnstileState.Unlocked, "")]
+    [InlineData(TurnstileState.NoEntry, TurnstileState.Locked, "Lights On")]
+    public void Enable(TurnstileState initialState, TurnstileState endState, string message)
+    {
+        var machine = new TurnstileStateMachine(initialState);
+
+        var result = machine.Enable();
+
+        Assert.Equal(message, result);
+        Assert.Equal(endState, machine.State);
     }
 }
